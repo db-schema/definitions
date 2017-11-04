@@ -1,7 +1,11 @@
-require 'db_schema/definitions/version'
+require 'dry/equalizer'
 
-module DbSchema
-  module Definitions
-    # Your code goes here...
-  end
-end
+require_relative 'definitions/schema'
+require_relative 'definitions/table'
+require_relative 'definitions/field'
+require_relative 'definitions/index'
+require_relative 'definitions/foreign_key'
+require_relative 'definitions/check_constraint'
+require_relative 'definitions/enum'
+require_relative 'definitions/extension'
+require_relative 'definitions/version'

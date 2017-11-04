@@ -11,4 +11,5 @@ guard :rspec, cmd: 'bundle exec rspec', all_on_start: true do
   # Ruby files
   ruby = dsl.ruby
   dsl.watch_spec_files_for(ruby.lib_files)
+  watch('lib/db_schema/definitions/table.rb') { 'spec/db_schema/definitions/null_table_spec.rb' }
 end
