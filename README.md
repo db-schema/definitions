@@ -1,4 +1,4 @@
-# DbSchema::Definitions
+# DbSchema::Definitions [![Build Status](https://travis-ci.org/db-schema/definitions.svg?branch=master)](https://travis-ci.org/db-schema/definitions)
 
 This gem contains definition classes
 [describing database structure](https://github.com/db-schema/core/wiki/Schema-analysis-DSL)
