@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe DbSchema::Definitions::NullTable do
   describe '#name' do
     it 'returns nil' do

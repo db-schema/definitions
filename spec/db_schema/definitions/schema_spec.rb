@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe DbSchema::Definitions::Schema do
   let(:users) do
     DbSchema::Definitions::Table.new(

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 RSpec.describe DbSchema::Definitions::Table do
   subject do
     DbSchema::Definitions::Table.new(
