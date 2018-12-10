@@ -1,15 +1,20 @@
 module DbSchema
   module Definitions
     class Index
-      include Dry::Equalizer(:name, :columns, :unique?, :type, :condition)
+      include Dry::Equalizer(:name, :columns, :primary?, :unique?, :type, :condition)
       attr_reader :name, :columns, :type, :condition
 
-      def initialize(name:, columns:, unique: false, type: :btree, condition: nil)
+      def initialize(name:, columns:, primary: false, unique: false, type: :btree, condition: nil)
         @name      = name.to_sym
         @columns   = columns
+        @primary   = primary
         @unique    = unique
         @type      = type
         @condition = condition
+      end
+
+      def primary?
+        @primary
       end
 
       def unique?
@@ -36,6 +41,7 @@ module DbSchema
         Index.new(
           name:      new_name,
           columns:   columns,
+          primary:   primary?,
           unique:    unique?,
           type:      type,
           condition: condition
@@ -46,6 +52,7 @@ module DbSchema
         Index.new(
           name:      name,
           columns:   columns,
+          primary:   primary?,
           unique:    unique?,
           type:      type,
           condition: new_condition
