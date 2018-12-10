@@ -2,7 +2,18 @@ RSpec.describe DbSchema::Definitions::Schema do
   let(:users) do
     DbSchema::Definitions::Table.new(
       :users,
-      fields: [DbSchema::Definitions::Field::Integer.new(:id, primary_key: true)]
+      fields: [
+        DbSchema::Definitions::Field::Integer.new(:id)
+      ],
+      indexes: [
+        DbSchema::Definitions::Index.new(
+          name: :users_pkey,
+          columns: [
+            DbSchema::Definitions::Index::TableField.new(:id)
+          ],
+          primary: true
+        )
+      ]
     )
   end
 

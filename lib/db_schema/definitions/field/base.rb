@@ -2,23 +2,18 @@ module DbSchema
   module Definitions
     module Field
       class Base
-        include Dry::Equalizer(:name, :type, :primary_key?, :options)
+        include Dry::Equalizer(:name, :type, :options)
         attr_reader :name, :default
 
-        def initialize(name, primary_key: false, null: true, default: nil, **attributes)
-          @name        = name
-          @primary_key = primary_key
-          @null        = null
-          @default     = default
-          @attributes  = attributes
-        end
-
-        def primary_key?
-          @primary_key
+        def initialize(name, null: true, default: nil, **attributes)
+          @name       = name
+          @null       = null
+          @default    = default
+          @attributes = attributes
         end
 
         def null?
-          !primary_key? && @null
+          @null
         end
 
         def default_is_expression?
@@ -57,15 +52,15 @@ module DbSchema
         end
 
         def with_type(new_type)
-          Field.build(name, new_type, **options, primary_key: primary_key?)
+          Field.build(name, new_type, **options)
         end
 
         def with_attribute(attr_name, attr_value)
-          Field.build(name, type, **options, primary_key: primary_key?, attr_name => attr_value)
+          Field.build(name, type, **options, attr_name => attr_value)
         end
 
         def with_default(new_default)
-          Field.build(name, type, **options, primary_key: primary_key?, default: new_default)
+          Field.build(name, type, **options, default: new_default)
         end
 
         class << self

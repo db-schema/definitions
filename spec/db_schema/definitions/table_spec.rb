@@ -3,13 +3,20 @@ RSpec.describe DbSchema::Definitions::Table do
     DbSchema::Definitions::Table.new(
       :users,
       fields: [
-        DbSchema::Definitions::Field::Integer.new(:id, primary_key: true),
+        DbSchema::Definitions::Field::Integer.new(:id),
         DbSchema::Definitions::Field::Varchar.new(:phone),
         DbSchema::Definitions::Field::Varchar.new(:first_name),
         DbSchema::Definitions::Field::Varchar.new(:last_name),
         DbSchema::Definitions::Field::Integer.new(:city_id, null: false)
       ],
       indexes: [
+        DbSchema::Definitions::Index.new(
+          name: :users_pkey,
+          columns: [
+            DbSchema::Definitions::Index::TableField.new(:id)
+          ],
+          primary: true
+        ),
         DbSchema::Definitions::Index.new(
           name: :users_phone_index,
           columns: [
