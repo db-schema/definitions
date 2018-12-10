@@ -128,6 +128,36 @@ RSpec.describe DbSchema::Definitions::Table do
     end
   end
 
+  describe '#primary_key' do
+    context 'on a table with a primary key' do
+      it "returns the table's primary key" do
+        expect(subject.primary_key).to eq(subject.indexes.first)
+      end
+    end
+
+    context 'on a table without a primary key' do
+      it 'returns a NullIndex' do
+        subject.indexes.shift
+        expect(subject.primary_key).to be_a(DbSchema::Definitions::NullIndex)
+      end
+    end
+  end
+
+  describe '#has_primary_key?' do
+    context 'on a table with a primary key' do
+      it "returns the table's primary key" do
+        expect(subject).to have_primary_key
+      end
+    end
+
+    context 'on a table without a primary key' do
+      it 'returns a NullIndex' do
+        subject.indexes.shift
+        expect(subject).not_to have_primary_key
+      end
+    end
+  end
+
   describe '#check' do
     context 'with a name of an existing check constraint' do
       it 'returns a check constraint definition' do

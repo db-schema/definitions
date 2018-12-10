@@ -47,6 +47,14 @@ module DbSchema
         end
       end
 
+      def primary_key
+        indexes.find(&:primary?) || NullIndex.new
+      end
+
+      def has_primary_key?
+        !primary_key.is_a?(NullIndex)
+      end
+
       def check(check_name)
         checks.find { |check| check.name == check_name } || NullCheckConstraint.new
       end
