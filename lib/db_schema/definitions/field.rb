@@ -22,6 +22,7 @@ end
 
 require_relative 'field/base'
 require_relative 'field/numeric'
+require_relative 'field/serial'
 require_relative 'field/monetary'
 require_relative 'field/character'
 require_relative 'field/binary'

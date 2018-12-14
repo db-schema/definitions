@@ -1,15 +1,15 @@
 module DbSchema
   module Definitions
     module Field
-      class SmallSerial
+      class SmallSerial < Base
         register :smallserial
       end
 
-      class Serial
+      class Serial < Base
         register :serial
       end
 
-      class BigSerial
+      class BigSerial < Base
         register :bigserial
       end
     end
