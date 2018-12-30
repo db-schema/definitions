@@ -25,8 +25,6 @@ if defined?(AwesomePrint)
             :dbschema_definitions_null_object
           when ::DbSchema::Definitions::Table
             :dbschema_definitions_table
-          when ::DbSchema::Definitions::Field::Custom
-            :dbschema_definitions_custom_field
           when ::DbSchema::Definitions::Field::Base
             :dbschema_definitions_field
           when ::DbSchema::Definitions::Index
@@ -47,10 +45,10 @@ if defined?(AwesomePrint)
         end
 
       private
-        def awesome_dbschema_definitions_schema(object)
-          data = ["tables: #{object.tables.ai}"]
-          data << "enums: #{object.enums.ai}" if object.enums.any?
-          data << "extensions: #{object.extensions.ai}" if object.extensions.any?
+        def awesome_dbschema_definitions_schema(schema)
+          data = ["tables: #{schema.tables.ai}"]
+          data << "enums: #{schema.enums.ai}" if schema.enums.any?
+          data << "extensions: #{schema.extensions.ai}" if schema.extensions.any?
 
           data_string = data.join(', ')
           "#<DbSchema::Definitions::Schema #{data_string}>"
@@ -60,18 +58,18 @@ if defined?(AwesomePrint)
           "#<#{object.class}>"
         end
 
-        def awesome_dbschema_definitions_table(object)
-          data = ["fields: #{object.fields.ai}"]
-          data << "indexes: #{object.indexes.ai}" if object.indexes.any?
-          data << "checks: #{object.checks.ai}" if object.checks.any?
-          data << "foreign_keys: #{object.foreign_keys.ai}" if object.foreign_keys.any?
+        def awesome_dbschema_definitions_table(table)
+          data = ["fields: #{table.fields.ai}"]
+          data << "indexes: #{table.indexes.ai}" if table.indexes.any?
+          data << "checks: #{table.checks.ai}" if table.checks.any?
+          data << "foreign_keys: #{table.foreign_keys.ai}" if table.foreign_keys.any?
 
           data_string = indent_lines(data.join(', '))
-          "#<DbSchema::Definitions::Table #{object.name.ai} #{data_string}>"
+          "#<DbSchema::Definitions::Table #{table.name.ai} #{data_string}>"
         end
 
-        def awesome_dbschema_definitions_field(object)
-          options = object.options.map do |k, v|
+        def awesome_dbschema_definitions_field(field)
+          options = field.options.map do |k, v|
             key = colorize("#{k}:", :symbol)
 
             if (k == :default) && v.is_a?(Symbol)
@@ -81,75 +79,65 @@ if defined?(AwesomePrint)
             end
           end.unshift(nil).join(', ')
 
-          "#<#{object.class} #{object.name.ai}#{options}>"
+          if field.custom?
+            "#<DbSchema::Definitions::Field::Custom (#{field.type.ai}) #{field.name.ai}#{options}>"
+          else
+            "#<#{field.class} #{field.name.ai}#{options}>"
+          end
         end
 
-        def awesome_dbschema_definitions_custom_field(object)
-          options = object.options.map do |k, v|
-            key = colorize("#{k}:", :symbol)
-
-            if (k == :default) && v.is_a?(Symbol)
-              "#{key} #{colorize(v.to_s, :string)}"
-            else
-              "#{key} #{v.ai}"
-            end
-          end.unshift(nil).join(', ')
-
-          "#<DbSchema::Definitions::Field::Custom (#{object.type.ai}) #{object.name.ai}#{options}>"
-        end
-
-        def awesome_dbschema_definitions_index(object)
-          columns = format_dbschema_fields(object.columns)
-          using = ' using ' + colorize(object.type.to_s, :symbol) unless object.btree?
+        def awesome_dbschema_definitions_index(index)
+          columns = format_dbschema_fields(index.columns)
+          using = ' using ' + colorize(index.type.to_s, :symbol) unless index.btree?
 
           data = [nil]
-          data << colorize('primary key', :nilclass) if object.primary?
-          data << colorize('unique', :nilclass) if object.unique?
-          data << colorize('condition: ', :symbol) + object.condition.ai unless object.condition.nil?
+          data << colorize('primary key', :nilclass) if index.primary?
+          data << colorize('unique', :nilclass) if index.unique?
+          data << colorize('condition: ', :symbol) + index.condition.ai unless index.condition.nil?
 
-          "#<#{object.class} #{object.name.ai} on #{columns}#{using}#{data.join(', ')}>"
+          "#<#{index.class} #{index.name.ai} on #{columns}#{using}#{data.join(', ')}>"
         end
 
-        def awesome_dbschema_definitions_index_column(object)
-          data = [object.name.ai]
+        def awesome_dbschema_definitions_index_column(column)
+          data = [column.name.ai]
 
-          if object.desc?
+          if column.desc?
             data << colorize('desc', :nilclass)
-            data << colorize('nulls last', :symbol) if object.nulls == :last
+            data << colorize('nulls last', :symbol) if column.nulls == :last
           else
-            data << colorize('nulls first', :symbol) if object.nulls == :first
+            data << colorize('nulls first', :symbol) if column.nulls == :first
           end
 
           data.join(' ')
         end
 
-        def awesome_dbschema_definitions_check_constraint(object)
-          "#<#{object.class} #{object.name.ai} #{object.condition.ai}>"
+        def awesome_dbschema_definitions_check_constraint(check)
+          "#<#{check.class} #{check.name.ai} #{check.condition.ai}>"
         end
 
-        def awesome_dbschema_definitions_foreign_key(object)
-          fields = format_dbschema_fields(object.fields)
-          references = "#{colorize('references', :class)} #{object.table.ai}"
-          references << ' ' + format_dbschema_fields(object.keys) unless object.references_primary_key?
+        def awesome_dbschema_definitions_foreign_key(fkey)
+          fields = format_dbschema_fields(fkey.fields)
+          references = "#{colorize('references', :class)} #{fkey.table.ai}"
+          references << ' ' + format_dbschema_fields(fkey.keys) unless fkey.references_primary_key?
 
           data = [nil]
-          data << colorize("on_update:", :symbol) + " #{object.on_update.ai}" unless object.on_update == :no_action
-          data << colorize("on_delete:", :symbol) + " #{object.on_delete.ai}" unless object.on_delete == :no_action
-          data << colorize('deferrable', :nilclass) if object.deferrable?
+          data << colorize("on_update:", :symbol) + " #{fkey.on_update.ai}" unless fkey.on_update == :no_action
+          data << colorize("on_delete:", :symbol) + " #{fkey.on_delete.ai}" unless fkey.on_delete == :no_action
+          data << colorize('deferrable', :nilclass) if fkey.deferrable?
 
-          "#<#{object.class} #{object.name.ai} on #{fields} #{references}#{data.join(', ')}>"
+          "#<#{fkey.class} #{fkey.name.ai} on #{fields} #{references}#{data.join(', ')}>"
         end
 
-        def awesome_dbschema_definitions_enum(object)
-          values = object.values.map do |value|
+        def awesome_dbschema_definitions_enum(enum)
+          values = enum.values.map do |value|
             colorize(value.to_s, :string)
           end.join(', ')
 
-          "#<#{object.class} #{object.name.ai} (#{values})>"
+          "#<#{enum.class} #{enum.name.ai} (#{values})>"
         end
 
-        def awesome_dbschema_definitions_extension(object)
-          "#<#{object.class} #{object.name.ai}>"
+        def awesome_dbschema_definitions_extension(extension)
+          "#<#{extension.class} #{extension.name.ai}>"
         end
 
         def format_dbschema_fields(fields)
