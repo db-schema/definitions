@@ -3,11 +3,12 @@ RSpec.describe DbSchema::Definitions::Table do
     DbSchema::Definitions::Table.new(
       :users,
       fields: [
-        DbSchema::Definitions::Field::Integer.new(:id),
+        DbSchema::Definitions::Field::Serial.new(:id),
         DbSchema::Definitions::Field::Varchar.new(:phone),
         DbSchema::Definitions::Field::Varchar.new(:first_name),
         DbSchema::Definitions::Field::Varchar.new(:last_name),
-        DbSchema::Definitions::Field::Integer.new(:city_id, null: false)
+        DbSchema::Definitions::Field::Integer.new(:city_id, null: false),
+        DbSchema::Definitions::Field::Custom.class_for(:user_role).new(:role, default: 'guest')
       ],
       indexes: [
         DbSchema::Definitions::Index.new(
