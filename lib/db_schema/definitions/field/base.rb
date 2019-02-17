@@ -59,6 +59,10 @@ module DbSchema
           Field.build(name, type, **options, attr_name => attr_value)
         end
 
+        def with_null(null)
+          Field.build(name, type, **options, null: null)
+        end
+
         def with_default(new_default)
           Field.build(name, type, **options, default: new_default)
         end
