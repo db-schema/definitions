@@ -1,5 +1,5 @@
 module DbSchema
   module Definitions
-    VERSION = '0.2.rc1'
+    VERSION = '0.2'
   end
 end
